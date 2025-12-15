@@ -22,6 +22,30 @@ const Navbar = () => {
         { name: 'Contact', href: '#footer' },
     ];
 
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const userData = localStorage.getItem('user');
+        
+        if (token && userData) {
+            setIsAuthenticated(true);
+            setUser(JSON.parse(userData));
+        }
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setIsAuthenticated(false);
+        setUser(null);
+        window.location.href = '/';
+    };
+
+
+
+
     return (
         <nav
             className={`navbar ${scrolled ? 'scrolled' : ''}`}
@@ -57,7 +81,45 @@ const Navbar = () => {
                         {link.name}
                     </a>
                 ))}
-                <button className="btn btn-primary">Book Now</button>
+                
+                {isAuthenticated ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <span style={{ fontSize: '0.9rem' }}>
+                            Hello, {user?.name}
+                        </span>
+                        <button
+                            onClick={() => window.location.href = '/admin/dashboard'}
+                            className="btn btn-primary"
+                            style={{
+                                padding: '8px 16px',
+                                fontSize: '0.9rem'
+                            }}
+                        >
+                            Dashboard
+                        </button>
+                        <button
+                            onClick={handleLogout}
+                            style={{
+                                background: 'none',
+                                border: '1px solid var(--color-accent)',
+                                color: 'var(--color-accent)',
+                                padding: '8px 16px',
+                                borderRadius: '0.5rem',
+                                cursor: 'pointer',
+                                fontSize: '0.9rem'
+                            }}
+                        >
+                            Logout
+                        </button>
+                    </div>
+                ) : (
+                    <button 
+                        onClick={() => window.location.href = '/login'}
+                        className="btn btn-primary"
+                    >
+                        Staff Login
+                    </button>
+                )}
             </div>
 
             {/* Mobile Menu Toggle */}
