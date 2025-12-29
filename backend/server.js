@@ -10,17 +10,21 @@ const reservationRoutes = require('./routes/reservationRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 
 const app = express();
+const path = require('path');
 
 // Connect to database
 connectDB();
 
 // Middleware
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files (for local uploads)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/auth', authRoutes);

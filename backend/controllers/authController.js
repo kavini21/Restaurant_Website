@@ -1,10 +1,15 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// Register (for admin creation)
+// Register kk
 exports.register = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
+        
+        // Validate JWT_SECRET is set
+        if (!process.env.JWT_SECRET) {
+            return res.status(500).json({ message: 'Server configuration error' });
+        }
         
         // Check if user exists
         const existingUser = await User.findOne({ email });
@@ -33,6 +38,10 @@ exports.register = async (req, res) => {
             }
         });
     } catch (error) {
+        // Handle duplicate key error (MongoDB)
+        if (error.code === 11000) {
+            return res.status(400).json({ message: 'Email already exists' });
+        }
         res.status(400).json({ message: error.message });
     }
 };
@@ -41,6 +50,11 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
+        
+        // Validate JWT_SECRET is set
+        if (!process.env.JWT_SECRET) {
+            return res.status(500).json({ message: 'Server configuration error' });
+        }
         
         // Find user
         const user = await User.findOne({ email });
@@ -72,6 +86,19 @@ exports.login = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: 'Server error during login' });
+    }
+};
+
+// Get current user profile (protected route)
+exports.getProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json({ user });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
 };

@@ -27,8 +27,8 @@ exports.createDish = async (req, res) => {
         const dish = new Dish({
             ...req.body,
             image: req.file ? {
-                url: req.file.path,
-                public_id: req.file.filename
+                url: req.file.url,
+                public_id: req.file.publicId || null
             } : null
         });
         await dish.save();
@@ -41,9 +41,19 @@ exports.createDish = async (req, res) => {
 // Update dish (admin only)
 exports.updateDish = async (req, res) => {
     try {
+        const updateData = { ...req.body };
+        
+        // If new image is uploaded, update image field
+        if (req.file) {
+            updateData.image = {
+                url: req.file.url,
+                public_id: req.file.publicId || null
+            };
+        }
+        
         const dish = await Dish.findByIdAndUpdate(
             req.params.id,
-            { ...req.body },
+            updateData,
             { new: true, runValidators: true }
         );
         if (!dish) return res.status(404).json({ message: 'Dish not found' });
