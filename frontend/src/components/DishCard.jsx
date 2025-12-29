@@ -22,38 +22,38 @@ const DishCard = ({ dish, index }) => {
                     alt={dish.title}
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.5 }}
-                    style={{ 
-                        width: '100%', 
-                        height: '100%', 
+                    style={{
+                        width: '100%',
+                        height: '100%',
                         objectFit: 'cover'
                     }}
                 />
             </div>
             <div style={{ padding: '1.5rem' }}>
-                <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    marginBottom: '0.5rem' 
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '0.5rem'
                 }}>
-                    <h3 style={{ 
-                        fontSize: '1.25rem', 
-                        fontFamily: 'var(--font-heading)' 
+                    <h3 style={{
+                        fontSize: '1.25rem',
+                        fontFamily: 'var(--font-heading)'
                     }}>
                         {dish.title}
                     </h3>
-                    <span style={{ 
-                        color: 'var(--color-accent)', 
-                        fontWeight: 'bold', 
-                        fontSize: '1.1rem' 
+                    <span style={{
+                        color: 'var(--color-accent)',
+                        fontWeight: 'bold',
+                        fontSize: '1.1rem'
                     }}>
                         {dish.price}
                     </span>
                 </div>
-                <p style={{ 
-                    color: '#666', 
-                    fontSize: '0.9rem', 
-                    marginBottom: '1.5rem' 
+                <p style={{
+                    color: '#666',
+                    fontSize: '0.9rem',
+                    marginBottom: '1.5rem'
                 }}>
                     {dish.description}
                 </p>

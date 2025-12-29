@@ -1,21 +1,23 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { authService } from '../services/authService';
 
 const ProtectedRoute = ({ children, requiredRole = null }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(null);
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const userData = localStorage.getItem('user');
+        const checkAuth = () => {
+            if (authService.isAuthenticated()) {
+                const currentUser = authService.getCurrentUser();
+                setUser(currentUser);
+                setIsAuthenticated(true);
+            } else {
+                setIsAuthenticated(false);
+            }
+        };
 
-        if (token && userData) {
-            const parsedUser = JSON.parse(userData);
-            setUser(parsedUser);
-            setIsAuthenticated(true);
-        } else {
-            setIsAuthenticated(false);
-        }
+        checkAuth();
     }, []);
 
     // Show loading state
