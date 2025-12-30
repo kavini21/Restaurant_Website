@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import MovingBorderButton from './MovingBorderButton';
 
-const DishCard = ({ dish, index }) => {
+const DishCard = ({ dish, index, onOrderClick }) => {
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -59,6 +59,7 @@ const DishCard = ({ dish, index }) => {
                 </p>
                 <div style={{ textAlign: 'center' }}>
                     <MovingBorderButton
+                        onClick={() => onOrderClick(dish)}
                         borderRadius="0.5rem"
                         duration={2500}
                         buttonStyle={{

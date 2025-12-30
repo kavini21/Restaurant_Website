@@ -1,14 +1,37 @@
 const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+// Create transporter lazily to avoid startup authentication errors
+const getTransporter = () => {
+    // Check if email credentials are configured
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS || 
+        process.env.EMAIL_USER.trim() === '' || process.env.EMAIL_PASS.trim() === '') {
+        console.log('Email credentials not configured - email sending disabled');
+        return null;
     }
-});
+    
+    try {
+        return nodemailer.createTransporter({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+    } catch (error) {
+        console.log('Failed to create email transporter:', error.message);
+        return null;
+    }
+};
 
 exports.sendReservationEmail = async (reservation) => {
+    const transporter = getTransporter();
+    
+    // Skip sending email if credentials not configured
+    if (!transporter) {
+        console.log('Email not configured. Skipping reservation confirmation email.');
+        return;
+    }
+    
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: reservation.email,
@@ -33,6 +56,14 @@ exports.sendReservationEmail = async (reservation) => {
 };
 
 exports.sendContactEmail = async (contact) => {
+    const transporter = getTransporter();
+    
+    // Skip sending email if credentials not configured
+    if (!transporter) {
+        console.log('Email not configured. Skipping contact form email.');
+        return;
+    }
+    
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: process.env.EMAIL_USER, // Admin email
