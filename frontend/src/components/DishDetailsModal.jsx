@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Clock, Users, Calendar, Phone, Mail, User, MessageSquare } from 'lucide-react';
 import { useState } from 'react';
 import MovingBorderButton from './MovingBorderButton';
+import { reservationService } from '../services/reservationService';
 
 const DishDetailsModal = ({ dish, isOpen, onClose }) => {
     const [formData, setFormData] = useState({
@@ -30,28 +31,27 @@ const DishDetailsModal = ({ dish, isOpen, onClose }) => {
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:5000/api/reservations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    ...formData,
-                    specialRequests: formData.specialRequests 
-                        ? `${formData.specialRequests} - Interested in: ${dish.title}`
-                        : `Interested in ordering: ${dish.title}`
-                })
-            });
+            // Prepare reservation data
+            const reservationData = {
+                name: formData.name.trim(),
+                email: formData.email.trim(),
+                phone: formData.phone.trim(),
+                date: formData.date,
+                time: formData.time,
+                guests: parseInt(formData.guests),
+                specialRequests: formData.specialRequests 
+                    ? `${formData.specialRequests.trim()} - Interested in: ${dish.title}`
+                    : `Interested in ordering: ${dish.title}`
+            };
 
-            const data = await response.json();
+            // Call reservation service
+            const data = await reservationService.createReservation(reservationData);
 
-            if (!response.ok) {
-                throw new Error(data.message || 'Reservation failed');
-            }
-
+            // Show success notification
             setSuccess(true);
+            
+            // Reset form and close modal after 3 seconds
             setTimeout(() => {
-                onClose();
                 setSuccess(false);
                 setFormData({
                     name: '',
@@ -62,9 +62,10 @@ const DishDetailsModal = ({ dish, isOpen, onClose }) => {
                     guests: 2,
                     specialRequests: ''
                 });
+                onClose();
             }, 3000);
         } catch (err) {
-            setError(err.message);
+            setError(err.message || 'Failed to create reservation. Please try again.');
         } finally {
             setLoading(false);
         }
